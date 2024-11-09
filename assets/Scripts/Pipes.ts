@@ -24,14 +24,14 @@ export class Pipes extends Component {
   })
   public bottomPipe: Node;
 
-  private readonly MIN_GAP = 150;
+  private readonly MIN_GAP = 150; // Khoảng cách giữa hai ống
   private readonly MAX_GAP = 200;
-  private readonly MIN_HEIGHT = 100;
+  private readonly MIN_HEIGHT = 100; // Chiều cao của ống
   private readonly MAX_HEIGHT = 350;
 
   private tempStartLocationUp: Vec3;
   private tempStartLocationDown: Vec3;
-  private viewSize;
+  private viewSize = view.getVisibleSize();
   private game;
   private pipeSpeed: number;
   private tempSpeed: number;
@@ -41,8 +41,7 @@ export class Pipes extends Component {
     this.tempStartLocationUp = new Vec3(0, 0, 0);
     this.tempStartLocationDown = new Vec3(0, 0, 0);
 
-    this.viewSize = view.getVisibleSize();
-    this.game = find("GameCtrl").getComponent("GameCtrl");
+    this.game = find("GameCtrl").getComponent("GameCtrl"); // Tìm gameCtrl để lấy thông số tốc độ ống
     this.pipeSpeed = this.game.pipeSpeed;
 
     this.initPos();
@@ -50,7 +49,7 @@ export class Pipes extends Component {
 
   initPos() {
     // Đặt vị trí bắt đầu ở ngoài màn hình bên phải
-    const startX = this.viewSize.width;
+    const startX = this.viewSize.width / 2;
 
     // Tạo khoảng cách ngẫu nhiên giữa hai ống
     const gap = Math.random() * (this.MAX_GAP - this.MIN_GAP) + this.MIN_GAP;
@@ -86,12 +85,13 @@ export class Pipes extends Component {
       this.game.passPipe();
     }
 
-    // Chỉ destroy pipe khi nó đã đi qua hoàn toàn màn hình
-    const pipeWidth = this.topPipe.getComponent(UITransform).width;
-    const destroyPoint = -this.viewSize.width; // Tạo ống mới khi ống
-
-    if (this.topPipe.position.x <= destroyPoint) {
-      console.log("Destroying pipe at position:", this.topPipe.position.x);
+    console.log("size: " + this.viewSize.width);
+    console.log("top pipe:" + this.topPipe.position.x);
+    if (
+      this.topPipe.position.x <=
+      -this.viewSize.width / 2 -
+        this.topPipe.getComponent(UITransform).width * 2
+    ) {
       this.game.createPipe();
       this.node.destroy();
     }
